@@ -9,7 +9,6 @@ package bencode
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"strconv"
 	"time"
@@ -43,7 +42,7 @@ type Marshaler interface {
 	MarshalBencode() ([]byte, error)
 }
 
-// Marshal writes types bencoded to an io.Writer
+// marshal writes types bencoded to an io.Writer
 func marshal(w io.Writer, data interface{}) error {
 	switch v := data.(type) {
 	case Marshaler:
@@ -57,43 +56,43 @@ func marshal(w io.Writer, data interface{}) error {
 		}
 
 	case string:
-		fmt.Fprintf(w, "%d:%s", len(v), v)
+		marshalString(w, v)
 
 	case int:
-		fmt.Fprintf(w, "i%de", v)
+		marshalInt(w, int64(v))
 
 	case uint:
-		fmt.Fprintf(w, "i%se", strconv.FormatUint(uint64(v), 10))
+		marshalUint(w, uint64(v))
 
 	case int64:
-		fmt.Fprintf(w, "i%se", strconv.FormatInt(v, 10))
+		marshalInt(w, v)
 
 	case uint64:
-		fmt.Fprintf(w, "i%se", strconv.FormatUint(v, 10))
+		marshalUint(w, v)
 
 	case time.Duration: // Assume seconds
-		fmt.Fprintf(w, "i%se", strconv.FormatInt(int64(v/time.Second), 10))
+		marshalInt(w, int64(v/time.Second))
 
 	case map[string]interface{}:
-		fmt.Fprintf(w, "d")
+		w.Write([]byte{'d'})
 		for key, val := range v {
-			fmt.Fprintf(w, "%s:%s", strconv.Itoa(len(key)), key)
+			marshalString(w, key)
 			err := marshal(w, val)
 			if err != nil {
 				return err
 			}
 		}
-		fmt.Fprintf(w, "e")
+		w.Write([]byte{'e'})
 
 	case []string:
-		fmt.Fprintf(w, "l")
+		w.Write([]byte{'l'})
 		for _, val := range v {
 			err := marshal(w, val)
 			if err != nil {
 				return err
 			}
 		}
-		fmt.Fprintf(w, "e")
+		w.Write([]byte{'e'})
 
 	default:
 		// Although not currently necessary,
@@ -102,4 +101,22 @@ func marshal(w io.Writer, data interface{}) error {
 	}
 
 	return nil
+}
+
+func marshalInt(w io.Writer, v int64) {
+	w.Write([]byte{'i'})
+	w.Write([]byte(strconv.FormatInt(v, 10)))
+	w.Write([]byte{'e'})
+}
+
+func marshalUint(w io.Writer, v uint64) {
+	w.Write([]byte{'i'})
+	w.Write([]byte(strconv.FormatUint(v, 10)))
+	w.Write([]byte{'e'})
+}
+
+func marshalString(w io.Writer, v string) {
+	w.Write([]byte(strconv.Itoa(len(v))))
+	w.Write([]byte{':'})
+	w.Write([]byte(v))
 }
