@@ -5,6 +5,7 @@
 package bencode
 
 import (
+	"bytes"
 	"testing"
 	"time"
 )
@@ -37,5 +38,31 @@ func TestMarshal(t *testing.T) {
 		} else if string(got) != test.expected {
 			t.Errorf("\ngot:      %s\nexpected: %s", got, test.expected)
 		}
+	}
+}
+
+func BenchmarkMarshalScalar(b *testing.B) {
+	buf := &bytes.Buffer{}
+	encoder := NewEncoder(buf)
+
+	for i := 0; i < b.N; i++ {
+		encoder.Encode("test")
+		encoder.Encode(123)
+	}
+}
+
+func BenchmarkMarshalLarge(b *testing.B) {
+	data := map[string]interface{}{
+		"k1": []string{"a", "b", "c"},
+		"k2": 42,
+		"k3": "val",
+		"k4": uint(42),
+	}
+
+	buf := &bytes.Buffer{}
+	encoder := NewEncoder(buf)
+
+	for i := 0; i < b.N; i++ {
+		encoder.Encode(data)
 	}
 }
