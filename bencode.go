@@ -85,9 +85,11 @@ func marshal(w io.Writer, data interface{}) error {
 		marshalInt(w, int64(v/time.Second))
 
 	case Dict:
-		w.Write([]byte{'d'})
-		for key, val := range v {
-			marshalString(w, key)
+		marshal(w, map[string]interface{}(v))
+
+	case []Dict:
+		w.Write([]byte{'l'})
+		for _, val := range v {
 			err := marshal(w, val)
 			if err != nil {
 				return err
@@ -95,9 +97,10 @@ func marshal(w io.Writer, data interface{}) error {
 		}
 		w.Write([]byte{'e'})
 
-	case []Dict:
-		w.Write([]byte{'l'})
-		for _, val := range v {
+	case map[string]interface{}:
+		w.Write([]byte{'d'})
+		for key, val := range v {
+			marshalString(w, key)
 			err := marshal(w, val)
 			if err != nil {
 				return err
