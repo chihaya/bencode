@@ -8,11 +8,19 @@ package bencode
 
 import (
 	"bytes"
-	"errors"
+	"fmt"
 	"io"
 	"strconv"
 	"time"
 )
+
+// Dict represents a bencode dictionary.
+type Dict map[string]interface{}
+
+// NewDict allocates the memory for a Dict.
+func NewDict() Dict {
+	return make(Dict)
+}
 
 // An Encoder writes Bencoded objects to an output stream.
 type Encoder struct {
@@ -70,13 +78,26 @@ func marshal(w io.Writer, data interface{}) error {
 	case uint64:
 		marshalUint(w, v)
 
+	case []byte:
+		w.Write(v)
+
 	case time.Duration: // Assume seconds
 		marshalInt(w, int64(v/time.Second))
 
-	case map[string]interface{}:
+	case Dict:
 		w.Write([]byte{'d'})
 		for key, val := range v {
 			marshalString(w, key)
+			err := marshal(w, val)
+			if err != nil {
+				return err
+			}
+		}
+		w.Write([]byte{'e'})
+
+	case []Dict:
+		w.Write([]byte{'l'})
+		for _, val := range v {
 			err := marshal(w, val)
 			if err != nil {
 				return err
@@ -97,7 +118,7 @@ func marshal(w io.Writer, data interface{}) error {
 	default:
 		// Although not currently necessary,
 		// should handle []interface{} manually; Go can't do it implicitly
-		return errors.New("bencode: attempted to marshal unsupported type")
+		return fmt.Errorf("attempted to marshal unsupported type:\n%t", v)
 	}
 
 	return nil
