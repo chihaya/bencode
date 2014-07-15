@@ -97,6 +97,17 @@ func marshal(w io.Writer, data interface{}) error {
 		}
 		w.Write([]byte{'e'})
 
+	case map[string]interface{}:
+		w.Write([]byte{'d'})
+		for key, val := range v {
+			marshalString(w, key)
+			err := marshal(w, val)
+			if err != nil {
+				return err
+			}
+		}
+		w.Write([]byte{'e'})
+
 	case []string:
 		w.Write([]byte{'l'})
 		for _, val := range v {

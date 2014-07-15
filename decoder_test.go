@@ -21,8 +21,8 @@ var unmarshalTests = []struct {
 	{"l3:one3:twoe", []interface{}{"one", "two"}},
 	{"le", []interface{}{}},
 
-	{"d3:one2:aa3:two2:bbe", map[string]interface{}{"one": "aa", "two": "bb"}},
-	{"de", map[string]interface{}{}},
+	{"d3:one2:aa3:two2:bbe", Dict{"one": "aa", "two": "bb"}},
+	{"de", Dict{}},
 }
 
 func TestUnmarshal(t *testing.T) {
@@ -56,7 +56,7 @@ func BenchmarkUnmarshalScalar(b *testing.B) {
 }
 
 func TestUnmarshalLarge(t *testing.T) {
-	data := map[string]interface{}{
+	data := Dict{
 		"k1": []interface{}{"a", "b", "c"},
 		"k2": int64(42),
 		"k3": "val",
