@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var tests = []struct {
+var marshalTests = []struct {
 	input    interface{}
 	expected string
 }{
@@ -24,6 +24,7 @@ var tests = []struct {
 	{30 * time.Minute, "i1800e"},
 
 	{[]string{"one", "two"}, "l3:one3:twoe"},
+	{[]interface{}{"one", "two"}, "l3:one3:twoe"},
 	{[]string{}, "le"},
 
 	{map[string]interface{}{"one": "aa", "two": "bb"}, "d3:one2:aa3:two2:bbe"},
@@ -31,7 +32,7 @@ var tests = []struct {
 }
 
 func TestMarshal(t *testing.T) {
-	for _, test := range tests {
+	for _, test := range marshalTests {
 		got, err := Marshal(test.input)
 		if err != nil {
 			t.Error(err)

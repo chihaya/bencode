@@ -22,7 +22,7 @@ func NewDict() Dict {
 	return make(Dict)
 }
 
-// An Encoder writes Bencoded objects to an output stream.
+// An Encoder writes bencoded objects to an output stream.
 type Encoder struct {
 	w io.Writer
 }
@@ -97,10 +97,9 @@ func marshal(w io.Writer, data interface{}) error {
 		}
 		w.Write([]byte{'e'})
 
-	case map[string]interface{}:
-		w.Write([]byte{'d'})
-		for key, val := range v {
-			marshalString(w, key)
+	case []string:
+		w.Write([]byte{'l'})
+		for _, val := range v {
 			err := marshal(w, val)
 			if err != nil {
 				return err
@@ -108,7 +107,7 @@ func marshal(w io.Writer, data interface{}) error {
 		}
 		w.Write([]byte{'e'})
 
-	case []string:
+	case []interface{}:
 		w.Write([]byte{'l'})
 		for _, val := range v {
 			err := marshal(w, val)
