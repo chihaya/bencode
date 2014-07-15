@@ -129,8 +129,6 @@ func marshal(w io.Writer, data interface{}) error {
 		w.Write([]byte{'e'})
 
 	default:
-		// Although not currently necessary,
-		// should handle []interface{} manually; Go can't do it implicitly
 		return fmt.Errorf("attempted to marshal unsupported type:\n%t", v)
 	}
 
