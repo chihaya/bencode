@@ -2,8 +2,6 @@
 // Use of this source code is governed by the BSD 2-Clause license,
 // which can be found in the LICENSE file.
 
-// Package bencode implements bencoding of data as defined in BEP 3 using
-// type assertion over reflection for performance.
 package bencode
 
 import (
@@ -13,14 +11,6 @@ import (
 	"strconv"
 	"time"
 )
-
-// Dict represents a bencode dictionary.
-type Dict map[string]interface{}
-
-// NewDict allocates the memory for a Dict.
-func NewDict() Dict {
-	return make(Dict)
-}
 
 // An Encoder writes bencoded objects to an output stream.
 type Encoder struct {
