@@ -45,7 +45,7 @@ func unmarshal(r *bufio.Reader) (interface{}, error) {
 		return readTerminatedInt(r, 'e')
 
 	case 'l':
-		list := make([]interface{}, 0)
+		list := NewList()
 		for {
 			ok, err := readTerminator(r, 'e')
 			if err != nil {
@@ -63,7 +63,7 @@ func unmarshal(r *bufio.Reader) (interface{}, error) {
 		return list, nil
 
 	case 'd':
-		dict := make(Dict)
+		dict := NewDict()
 		for {
 			ok, err := readTerminator(r, 'e')
 			if err != nil {
