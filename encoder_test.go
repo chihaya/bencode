@@ -21,6 +21,7 @@ var marshalTests = []struct {
 	{uint64(45), "i45e"},
 
 	{"example", "7:example"},
+	{[]byte("example"), "7:example"},
 	{30 * time.Minute, "i1800e"},
 
 	{[]string{"one", "two"}, "l3:one3:twoe"},
