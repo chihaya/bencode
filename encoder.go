@@ -69,7 +69,7 @@ func marshal(w io.Writer, data interface{}) error {
 		marshalUint(w, v)
 
 	case []byte:
-		w.Write(v)
+		marshalBytes(w, v)
 
 	case time.Duration: // Assume seconds
 		marshalInt(w, int64(v/time.Second))
@@ -140,8 +140,12 @@ func marshalUint(w io.Writer, v uint64) {
 	w.Write([]byte{'e'})
 }
 
-func marshalString(w io.Writer, v string) {
+func marshalBytes(w io.Writer, v []byte) {
 	w.Write([]byte(strconv.Itoa(len(v))))
 	w.Write([]byte{':'})
-	w.Write([]byte(v))
+	w.Write(v)
+}
+
+func marshalString(w io.Writer, v string) {
+	marshalBytes(w, []byte(v))
 }
